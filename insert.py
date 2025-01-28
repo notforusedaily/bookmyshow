@@ -19,6 +19,13 @@ conn = psycopg2.connect(
 # Create a cursor object using the connection
 cursor = conn.cursor()
 
+
+cursor.execute("TRUNCATE TABLE auth_user CASCADE")
+cursor.execute("TRUNCATE TABLE movies_theater CASCADE")
+cursor.execute("TRUNCATE TABLE movies_seat CASCADE")
+cursor.execute("TRUNCATE TABLE movies_movie CASCADE")
+
+
 # Sample data for auth_user table
 # auth_user_data = [
 #     (1, 'password1', '2024-12-27 12:00:00+00', True, 'john_doe', 'John', 'Doe', 'john.doe@example.com', True, True, '2024-01-01 10:00:00+00'),
@@ -55,12 +62,12 @@ cursor = conn.cursor()
 #Sample data for movies_movie table
 movies_movie_data = [
   
-   (1, 'Pushapa', 'image1.jpg', 4.5, 'Actor 1, Actor 2', 'A great movie'),
-    (2, 'Animal', 'image2.jpg', 4.0, 'Actor 3, Actor 4', 'An exciting movie'),
-    (3, 'Saripoda Sinivaram', 'image3.jpg', 3.5, 'Actor 5, Actor 6', 'A funny movie'),
-    (4, 'Jailer', 'image4.jpg', 4.8, 'Actor 7, Actor 8', 'A thrilling movie'),
-    (5, 'Vikram', 'image5.jpg', 4.2, 'Actor 9, Actor 10', 'A dramatic movie'),
-    (6, 'Maharaja', 'image6.jpg', 4.3, 'Actor 11, Actor 12', 'A royal adventure')
+   (1, 'Avatar', 'image1.jpg', 4.5, 'Actor 1, Actor 2', 'A great movie'),
+    (2, 'Openheimer', 'image2.jpg', 4.0, 'Actor 3, Actor 4', 'An exciting movie'),
+    (3, 'Barbie', 'image3.jpg', 3.5, 'Actor 5, Actor 6', 'A funny movie'),
+    (4, 'Fight_Club', 'image4.jpg', 4.8, 'Actor 7, Actor 8', 'A thrilling movie'),
+    (5, 'Gone_Girl', 'image5.jpg', 4.2, 'Actor 9, Actor 10', 'A dramatic movie'),
+    (6, 'Transformers', 'image6.jpg', 4.3, 'Actor 11, Actor 12', 'A royal adventure')
 
 ]
 
