@@ -111,10 +111,10 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [
                 {
-                    "host": "redis-18724.c85.us-east-1-2.ec2.redns.redis-cloud.com",
-                    "port": 18724,
+                    "host": "redis-11548.crce179.ap-south-1-1.ec2.redns.redis-cloud.com",
+                    "port": 11548,
                     "username": "default",  # Optional, depending on Redis setup
-                    "password": "dA7LpUUB1dgTsLB3wsZvcA64WymbbNba",
+                    "password": "bsI5Pzt7UPsVAZbRjxNclmOkSz2KGB4t",
                 }
             ],
         },
