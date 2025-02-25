@@ -115,117 +115,133 @@
     font-family: Arial, sans-serif;
   }
   
-  /* Theater and Screen Styling */
-  .theater-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .seat-row {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: center;
-    margin-bottom: 10px;
-  }
-  
-  .row-label {
-    width: 30px;
-    text-align: center;
-    font-weight: bold;
-    margin-right: 15px;
-  }
-  
-  .seats-in-row {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-  }
-  
-  /* Screen styling */
-  .screen {
-    width: 80%;
-    margin: 0 auto 30px;
-    background: linear-gradient(to bottom, #555, #333);
-    height: 40px;
-    text-align: center;
-    line-height: 40px;
-    color: white;
-    border-radius: 5px;
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-    font-weight: bold;
-    position: relative;
-    overflow: hidden;
-    transform: perspective(100px) rotateX(-5deg);
-  }
-  
-  .screen:after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.3);
-  }
-  
-  /* Seat styling */
-  .seat {
-    width: 35px;
-    height: 35px;
-    border: 1px solid #28a745;
-    margin: 3px;
-    text-align: center;
-    line-height: 35px;
-    cursor: pointer;
-    border-radius: 5px 5px 10px 10px;
-    transition: background-color 0.3s, color 0.3s;
-    position: relative;
-    overflow: hidden;
-    background-color: #f8f9fa;
-    font-size: 12px;
-  }
-  
-  .seat:after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background: rgba(0, 0, 0, 0.1);
-  }
-  
-  .seat:hover {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .seat.selected {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .seat.sold {
-    background-color: #e0e0e0;
-    border-color: #bdbdbd;
-    cursor: not-allowed;
-    color: #999;
-  }
-  
-  /* Create an aisle after 5 seats for more realistic layout */
-  .seat:nth-child(5) {
-    margin-right: 20px;
-  }
-  
-  /* Checkbox styling */
-  input[type="checkbox"]:checked + label {
-    background-color: #4caf50;
-    color: white;
-    border-radius: 5px 5px 10px 10px;
-  }
+ /* Theater and Screen Styling */
+.theater-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+/* Add more space after every 5th row */
+.seat-row:nth-child(5) {
+  margin-bottom: 30px;
+}
+
+.row-label {
+  width: 30px;
+  text-align: center;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+.seats-in-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Screen styling */
+.screen {
+  width: 80%;
+  margin: 0 auto 30px;
+  background: linear-gradient(to bottom, #555, #333);
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  color: white;
+  border-radius: 5px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  position: relative;
+  overflow: hidden;
+  transform: perspective(100px) rotateX(-5deg);
+}
+
+.screen:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Seat styling */
+.seat {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #28a745;
+  margin: 3px;
+  text-align: center;
+  line-height: 35px;
+  cursor: pointer;
+  border-radius: 5px 5px 10px 10px;
+  transition: background-color 0.3s, color 0.3s;
+  position: relative;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  font-size: 12px;
+}
+
+.seat:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.seat:hover {
+  background-color: #28a745;
+  color: white;
+}
+
+.seat.selected {
+  background-color: #28a745;
+  color: white;
+}
+
+.seat.sold {
+  background-color: #e0e0e0;
+  border-color: #bdbdbd;
+  cursor: not-allowed;
+  color: #999;
+}
+
+/* Create wider aisles after 5 seats for more realistic layout */
+.seat:nth-child(5) {
+  margin-right: 30px; /* Increased from 20px to 30px for wider aisle */
+}
+
+.seat:nth-child(10) {
+  margin-right: 30px; /* Added second aisle after seat 10 */
+}
+
+/* Create horizontal aisles by adding visual separation */
+.seats-in-row::before, .seats-in-row::after {
+  content: "";
+  display: block;
+  width: 8px;
+}
+
+/* Checkbox styling */
+input[type="checkbox"]:checked + label {
+  background-color: #4caf50;
+  color: white;
+  border-radius: 5px 5px 10px 10px;
+}
   
   /* Alert styling */
   .alert {
