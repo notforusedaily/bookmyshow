@@ -135,8 +135,13 @@
 }
 
 /* Add more space after every 2nd row to create horizontal walkways */
-.seat-row:nth-child(2n) {
-  margin-bottom: 30px;
+.seat-row {
+  margin-bottom: 10px;
+}
+
+/* Create a large horizontal aisle after row D (4th row) */
+.seat-row:nth-child(4) {
+  margin-bottom: 60px; /* Wide horizontal aisle after row D */
 }
 
 .row-label {
