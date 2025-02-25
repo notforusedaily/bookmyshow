@@ -2,21 +2,6 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-lg-10 mx-auto">
-      <!-- Debug Info -->
-      <div class="card mb-4">
-        <div class="card-body bg-light">
-          <h5>Debug Information</h5>
-          <p>Theater ID: {{ theaters.id }}</p>
-          <p>Total seats received: {{ seats|length }}</p>
-          <p>Movie: {{ theaters.movie.name }}</p>
-          <p>First few seats: 
-            {% for seat in seats|slice:":10" %}
-              {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-          </p>
-        </div>
-      </div>
-
       <!-- Movie and Theater Info -->
       <div class="card mb-4">
         <div class="card-body">
@@ -62,33 +47,33 @@
           <form method="POST">
             {% csrf_token %}
             
-            <!-- Direct seat printing for debugging -->
-            <div class="debug-seat-container mb-4">
-              <h6>All Available Seats:</h6>
-              <div class="debug-seats">
-                {% for seat in seats %}
-                  <div class="debug-seat {% if seat.is_booked %}sold{% endif %}">{{ seat.seat_number }}</div>
-                {% endfor %}
-              </div>
-            </div>
-            
-            <!-- Seat Layout Using Fixed Data -->
+            <!-- Seat Layout - Manual row grouping -->
             <div class="theater-container mb-5">
               {% with rows="ABCDEFGH"|make_list %}
                 {% for row in rows %}
                   <div class="seat-row mb-3">
                     <div class="row-label">{{ row }}</div>
                     <div class="seats-in-row">
-                      {% for col in "12345678910"|make_list %}
-                        {% with seat_number=row|add:col %}
-                          <div class="seat demo-seat" data-seat="{{ seat_number }}">
-                            {{ seat_number }}
+                      {% for seat in seats %}
+                        {% if seat.seat_number.0 == row %}
+                          <div class="seat {% if seat.is_booked %}sold{% endif %}">
+                            {% if not seat.is_booked %}
+                              <input
+                                type="checkbox"
+                                name="seats"
+                                value="{{ seat.id }}"
+                                class="d-none"
+                                id="seat-{{ seat.id }}"
+                              />
+                              <label
+                                for="seat-{{ seat.id }}"
+                                class="w-100 h-100 d-flex align-items-center justify-content-center"
+                                >{{ seat.seat_number }}</label>
+                            {% else %} 
+                              {{ seat.seat_number }} 
+                            {% endif %}
                           </div>
-                          
-                          {% if col == "5" %}
-                            <div class="aisle"></div>
-                          {% endif %}
-                        {% endwith %}
+                        {% endif %}
                       {% endfor %}
                     </div>
                   </div>
@@ -130,39 +115,6 @@
     font-family: Arial, sans-serif;
   }
   
-  /* Debug styling */
-  .debug-seat-container {
-    margin: 20px 0;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-  }
-  
-  .debug-seats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-  }
-  
-  .debug-seat {
-    padding: 5px 8px;
-    border: 1px solid #28a745;
-    border-radius: 3px;
-    font-size: 12px;
-  }
-  
-  .debug-seat.sold {
-    background-color: #e0e0e0;
-    border-color: #bdbdbd;
-  }
-  
-  /* Demo seat styling */
-  .demo-seat {
-    background-color: #fff3cd;
-    border-color: #ffeeba;
-    color: #856404;
-  }
-  
   /* Theater and Screen Styling */
   .theater-container {
     display: flex;
@@ -188,17 +140,8 @@
   
   .seats-in-row {
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
     gap: 8px;
     justify-content: center;
-  }
-  
-  /* Aisle styling */
-  .aisle {
-    width: 25px;
-    height: 35px;
-    margin: 3px;
   }
   
   /* Screen styling */
@@ -243,7 +186,6 @@
     overflow: hidden;
     background-color: #f8f9fa;
     font-size: 12px;
-    flex-shrink: 0;
   }
   
   .seat:after {
@@ -256,7 +198,7 @@
     background: rgba(0, 0, 0, 0.1);
   }
   
-  .seat:hover:not(.sold):not(.demo-seat) {
+  .seat:hover {
     background-color: #28a745;
     color: white;
   }
@@ -271,6 +213,11 @@
     border-color: #bdbdbd;
     cursor: not-allowed;
     color: #999;
+  }
+  
+  /* Create an aisle after 5 seats for more realistic layout */
+  .seat:nth-child(5) {
+    margin-right: 20px;
   }
   
   /* Checkbox styling */
@@ -328,45 +275,73 @@
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Map actual seat data to demo seats
-    const availableSeats = [];
-    {% for seat in seats %}
-      availableSeats.push("{{ seat.seat_number }}");
-    {% endfor %}
-    
-    // Color the demo seats based on availability
-    const demoSeats = document.querySelectorAll('.demo-seat');
-    demoSeats.forEach(seat => {
-      const seatNumber = seat.getAttribute('data-seat');
-      if (availableSeats.includes(seatNumber)) {
-        seat.classList.remove('demo-seat');
-        seat.classList.add('bookable');
-        
-        // Create the input and label
-        seat.innerHTML = `
-          <input type="checkbox" name="seats" value="${seatNumber}" class="d-none" id="seat-${seatNumber}" />
-          <label for="seat-${seatNumber}" class="w-100 h-100 d-flex align-items-center justify-content-center">
-            ${seatNumber}
-          </label>
-        `;
-      }
-    });
+    // Get all seat checkboxes
+    const seatCheckboxes = document.querySelectorAll('input[name="seats"]');
     
     // Add click event listeners to the seat labels
-    const seatLabels = document.querySelectorAll('label[for^="seat-"]');
-    seatLabels.forEach(label => {
-      label.addEventListener('click', function() {
-        // Toggle the selected class on the parent seat div
-        const seatDiv = this.parentElement;
-        seatDiv.classList.toggle('selected');
-      });
+    seatCheckboxes.forEach(checkbox => {
+      const label = document.querySelector(`label[for="${checkbox.id}"]`);
+      
+      if (label) {
+        label.addEventListener('click', function() {
+          // Toggle the selected class on the parent seat div
+          const seatDiv = this.parentElement;
+          seatDiv.classList.toggle('selected');
+        });
+      }
     });
     
     // Theater ID for WebSocket connection
     const theaterId = {{ theaters.id }};
     
-    console.log(`Debug: Total seats in JS: ${availableSeats.length}`);
-    console.log(`Debug: First few seats: ${availableSeats.slice(0, 10).join(', ')}`);
+    // Connect to WebSocket
+    try {
+      const socket = new WebSocket(`ws://${window.location.host}/ws/seats/${theaterId}/`);
+      
+      socket.onopen = function() {
+        console.log("Connected to WebSocket!");
+      };
+      
+      socket.onmessage = function(event) {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.seats) {
+            // Update seat availability in real-time
+            data.seats.forEach(seat => {
+              const seatCheckbox = document.getElementById(`seat-${seat.id}`);
+              if (seatCheckbox) {
+                const seatDiv = seatCheckbox.parentElement;
+                
+                if (seat.is_booked) {
+                  // Mark seat as sold
+                  seatDiv.classList.add('sold');
+                  seatDiv.innerHTML = seat.seat_number;
+                } else {
+                  // Mark seat as available
+                  seatDiv.classList.remove('sold');
+                  if (seatDiv.querySelector('input') === null) {
+                    seatDiv.innerHTML = `
+                      <input type="checkbox" name="seats" value="${seat.id}" class="d-none" id="seat-${seat.id}" />
+                      <label for="seat-${seat.id}" class="w-100 h-100 d-flex align-items-center justify-content-center">
+                        ${seat.seat_number}
+                      </label>
+                    `;
+                  }
+                }
+              }
+            });
+          }
+        } catch (e) {
+          console.error("Error processing WebSocket message:", e);
+        }
+      };
+      
+      socket.onerror = function(error) {
+        console.error("WebSocket error:", error);
+      };
+    } catch (e) {
+      console.error("Failed to establish WebSocket connection:", e);
+    }
   });
 </script>
 {% endblock %}
