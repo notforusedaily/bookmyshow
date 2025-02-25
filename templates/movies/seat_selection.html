@@ -47,36 +47,38 @@
           <form method="POST">
             {% csrf_token %}
             
-            <!-- Seat Layout -->
+            <!-- Seat Layout - Manual row grouping -->
             <div class="theater-container mb-5">
-              {% regroup seats by seat_number.0 as row_list %}
-              {% for row in row_list %}
-                <div class="seat-row mb-3">
-                  <div class="row-label">{{ row.grouper }}</div>
-                  <div class="seats-in-row">
-                    {% for seat in row.list %}
-                      <div class="seat {% if seat.is_booked %}sold{% endif %}">
-                        {% if not seat.is_booked %}
-                        <input
-                          type="checkbox"
-                          name="seats"
-                          value="{{ seat.id }}"
-                          class="d-none"
-                          id="seat-{{ seat.id }}"
-                        />
-                        <label
-                          for="seat-{{ seat.id }}"
-                          class="w-100 h-100 d-flex align-items-center justify-content-center"
-                          >{{ seat.seat_number }}</label
-                        >
-                        {% else %} 
-                          {{ seat.seat_number }} 
+              {% with rows="ABCDEFGH"|make_list %}
+                {% for row in rows %}
+                  <div class="seat-row mb-3">
+                    <div class="row-label">{{ row }}</div>
+                    <div class="seats-in-row">
+                      {% for seat in seats %}
+                        {% if seat.seat_number.0 == row %}
+                          <div class="seat {% if seat.is_booked %}sold{% endif %}">
+                            {% if not seat.is_booked %}
+                              <input
+                                type="checkbox"
+                                name="seats"
+                                value="{{ seat.id }}"
+                                class="d-none"
+                                id="seat-{{ seat.id }}"
+                              />
+                              <label
+                                for="seat-{{ seat.id }}"
+                                class="w-100 h-100 d-flex align-items-center justify-content-center"
+                                >{{ seat.seat_number }}</label>
+                            {% else %} 
+                              {{ seat.seat_number }} 
+                            {% endif %}
+                          </div>
                         {% endif %}
-                      </div>
-                    {% endfor %}
+                      {% endfor %}
+                    </div>
                   </div>
-                </div>
-              {% endfor %}
+                {% endfor %}
+              {% endwith %}
             </div>
 
             <!-- Seat Legend -->
@@ -124,19 +126,22 @@
   .seat-row {
     display: flex;
     align-items: center;
-    gap: 15px;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 10px;
   }
   
   .row-label {
     width: 30px;
     text-align: center;
     font-weight: bold;
+    margin-right: 15px;
   }
   
   .seats-in-row {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
+    justify-content: center;
   }
   
   /* Screen styling */
@@ -153,6 +158,7 @@
     font-weight: bold;
     position: relative;
     overflow: hidden;
+    transform: perspective(100px) rotateX(-5deg);
   }
   
   .screen:after {
@@ -179,6 +185,7 @@
     position: relative;
     overflow: hidden;
     background-color: #f8f9fa;
+    font-size: 12px;
   }
   
   .seat:after {
@@ -208,14 +215,9 @@
     color: #999;
   }
   
-  /* For better spacing between sections */
-  .seat:nth-child(5n)::after {
-    content: '';
-    position: absolute;
-    right: -15px;
-    top: 0;
-    height: 100%;
-    width: 10px;
+  /* Create an aisle after 5 seats for more realistic layout */
+  .seat:nth-child(5) {
+    margin-right: 20px;
   }
   
   /* Checkbox styling */
