@@ -51,12 +51,12 @@
             <div class="theater-container mb-5">
               {% with rows="ABCDEFGH"|make_list %}
                 {% for row in rows %}
-                  <div class="seat-row mb-3">
+                  <div class="seat-row mb-3 {% if row in 'GH' %}platinum-row{% else %}gold-row{% endif %}">
                     <div class="row-label">{{ row }}</div>
                     <div class="seats-in-row">
                       {% for seat in seats %}
                         {% if seat.seat_number.0 == row %}
-                          <div class="seat {% if seat.is_booked %}sold{% endif %}">
+                          <div class="seat {% if seat.is_booked %}sold{% endif %} {% if row in 'GH' %}platinum{% else %}gold{% endif %}">
                             {% if not seat.is_booked %}
                               <input
                                 type="checkbox"
@@ -64,6 +64,7 @@
                                 value="{{ seat.id }}"
                                 class="d-none"
                                 id="seat-{{ seat.id }}"
+                                data-seat-type="{% if row in 'GH' %}platinum{% else %}gold{% endif %}"
                               />
                               <label
                                 for="seat-{{ seat.id }}"
@@ -82,16 +83,24 @@
             </div>
 
             <!-- Seat Legend -->
-            <div class="d-flex justify-content-center mb-4">
-              <div class="d-flex align-items-center me-4">
+            <div class="d-flex justify-content-center mb-4 flex-wrap">
+              <div class="d-flex align-items-center me-4 mb-2">
                 <div class="seat" style="background-color: white"></div>
-                <span class="ms-2">Available</span>
+                <span class="ms-2">Available (Gold)</span>
               </div>
-              <div class="d-flex align-items-center me-4">
-                <div class="seat selected"></div>
-                <span class="ms-2">Selected</span>
+              <div class="d-flex align-items-center me-4 mb-2">
+                <div class="seat platinum" style="background-color: white"></div>
+                <span class="ms-2">Available (Platinum)</span>
               </div>
-              <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center me-4 mb-2">
+                <div class="seat gold selected"></div>
+                <span class="ms-2">Selected (Gold)</span>
+              </div>
+              <div class="d-flex align-items-center me-4 mb-2">
+                <div class="seat platinum selected"></div>
+                <span class="ms-2">Selected (Platinum)</span>
+              </div>
+              <div class="d-flex align-items-center mb-2">
                 <div class="seat sold"></div>
                 <span class="ms-2">Sold</span>
               </div>
@@ -115,7 +124,6 @@
     font-family: Arial, sans-serif;
   }
   
- /* Theater and Screen Styling */
 /* Theater and Screen Styling */
 .theater-container {
   display: flex;
@@ -141,7 +149,47 @@
 
 /* Create a large horizontal aisle after row D (4th row) */
 .seat-row:nth-child(4) {
-  margin-bottom: 60px; /* Wide horizontal aisle after row D */
+  margin-bottom: 80px; /* Wider horizontal aisle after row D */
+}
+
+/* Add section headers before the first row of each section */
+.gold-row:first-child::before,
+.platinum-row:first-child::before {
+  content: attr(data-section);
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Style the platinum section */
+.platinum-row {
+  position: relative;
+}
+
+/* Add section labels */
+.theater-container::before {
+  content: "GOLD SECTION";
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #DAA520;
+}
+
+/* Add platinum section label before row G */
+.seat-row:nth-child(7)::before {
+  content: "PLATINUM SECTION";
+  display: block;
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px;
+  top: -30px;
+  color: #E5E4E2;
 }
 
 .row-label {
@@ -192,7 +240,7 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Seat styling */
+/* Seat styling - Base styles */
 .seat {
   width: 35px;
   height: 35px;
@@ -209,6 +257,37 @@
   font-size: 12px;
 }
 
+/* Gold seat styling */
+.seat.gold {
+  border: 1px solid #DAA520;
+}
+
+.seat.gold:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: rgba(218, 165, 32, 0.3);
+}
+
+/* Platinum seat styling */
+.seat.platinum {
+  border: 1px solid #E5E4E2;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.seat.platinum:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: rgba(229, 228, 226, 0.5);
+}
+
 .seat:after {
   content: "";
   position: absolute;
@@ -222,6 +301,20 @@
 .seat:hover {
   background-color: #28a745;
   color: white;
+}
+
+/* Gold selected seat */
+.seat.gold.selected {
+  background-color: #DAA520;
+  color: white;
+  border-color: #B8860B;
+}
+
+/* Platinum selected seat */
+.seat.platinum.selected {
+  background-color: #E5E4E2;
+  color: #333;
+  border-color: #A9A9A9;
 }
 
 .seat.selected {
@@ -252,53 +345,61 @@
   margin-right: 40px; /* Aisle after seat 10 */
 }
 
-/* Checkbox styling */
-input[type="checkbox"]:checked + label {
-  background-color: #4caf50;
+/* Checkbox styling for gold seats */
+input[type="checkbox"][data-seat-type="gold"]:checked + label {
+  background-color: #DAA520;
   color: white;
   border-radius: 5px 5px 10px 10px;
 }
-  /* Alert styling */
-  .alert {
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    position: relative;
-  }
-  
-  .alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-  }
-  
-  .alert-error, .alert-danger {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-  }
-  
-  .alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeeba;
-  }
-  
-  .alert-info {
-    color: #0c5460;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
-  }
-  
-  .close-btn {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    background: none;
-    border: none;
-  }
+
+/* Checkbox styling for platinum seats */
+input[type="checkbox"][data-seat-type="platinum"]:checked + label {
+  background-color: #E5E4E2;
+  color: #333;
+  border-radius: 5px 5px 10px 10px;
+}
+
+/* Alert styling */
+.alert {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.alert-error, .alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+
+.alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
 </style>
 
 {% endblock %}
@@ -342,6 +443,8 @@ input[type="checkbox"]:checked + label {
               const seatCheckbox = document.getElementById(`seat-${seat.id}`);
               if (seatCheckbox) {
                 const seatDiv = seatCheckbox.parentElement;
+                const seatRow = seat.seat_number[0];
+                const seatType = seatRow === 'G' || seatRow === 'H' ? 'platinum' : 'gold';
                 
                 if (seat.is_booked) {
                   // Mark seat as sold
@@ -352,7 +455,7 @@ input[type="checkbox"]:checked + label {
                   seatDiv.classList.remove('sold');
                   if (seatDiv.querySelector('input') === null) {
                     seatDiv.innerHTML = `
-                      <input type="checkbox" name="seats" value="${seat.id}" class="d-none" id="seat-${seat.id}" />
+                      <input type="checkbox" name="seats" value="${seat.id}" class="d-none" id="seat-${seat.id}" data-seat-type="${seatType}" />
                       <label for="seat-${seat.id}" class="w-100 h-100 d-flex align-items-center justify-content-center">
                         ${seat.seat_number}
                       </label>
