@@ -56,7 +56,7 @@
                     <div class="seats-in-row">
                       {% for seat in seats %}
                         {% if seat.seat_number.0 == row %}
-                          <div class="seat {% if seat.is_booked %}sold{% endif %} {% if row in 'GH' %}platinum{% else %}gold{% endif %}">
+                          <div class="seat {% if seat.is_booked %}sold{% else %}{% if row in 'GH' %}platinum{% else %}gold{% endif %}{% endif %}">
                             {% if not seat.is_booked %}
                               <input
                                 type="checkbox"
@@ -85,11 +85,11 @@
             <!-- Seat Legend -->
             <div class="d-flex justify-content-center mb-4 flex-wrap">
               <div class="d-flex align-items-center me-4 mb-2">
-                <div class="seat" style="background-color: white"></div>
+                <div class="seat gold" style="background-color: #f8f9fa; border-color: #DAA520;"></div>
                 <span class="ms-2">Available (Gold)</span>
               </div>
               <div class="d-flex align-items-center me-4 mb-2">
-                <div class="seat platinum" style="background-color: white"></div>
+                <div class="seat platinum" style="background-color: #f8f9fa"></div>
                 <span class="ms-2">Available (Platinum)</span>
               </div>
               <div class="d-flex align-items-center me-4 mb-2">
@@ -189,7 +189,7 @@
   font-weight: bold;
   margin-bottom: 20px;
   top: -30px;
-  color: #E5E4E2;
+  color: #7B68EE; /* Medium Slate Blue - more distinct color for platinum section */
 }
 
 .row-label {
@@ -260,6 +260,7 @@
 /* Gold seat styling */
 .seat.gold {
   border: 1px solid #DAA520;
+  background-color: #f8f9fa;
 }
 
 .seat.gold:after {
@@ -272,9 +273,10 @@
   background: rgba(218, 165, 32, 0.3);
 }
 
-/* Platinum seat styling */
+/* Platinum seat styling - Updated with more distinct colors */
 .seat.platinum {
-  border: 1px solid #E5E4E2;
+  border: 1px solid #7B68EE; /* Medium Slate Blue border */
+  background-color: #f8f9fa;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
@@ -285,17 +287,7 @@
   left: 0;
   width: 100%;
   height: 5px;
-  background: rgba(229, 228, 226, 0.5);
-}
-
-.seat:after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 5px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(123, 104, 238, 0.3); /* Medium Slate Blue accent */
 }
 
 .seat:hover {
@@ -310,18 +302,14 @@
   border-color: #B8860B;
 }
 
-/* Platinum selected seat */
+/* Platinum selected seat - Updated with more distinct colors */
 .seat.platinum.selected {
-  background-color: #E5E4E2;
-  color: #333;
-  border-color: #A9A9A9;
-}
-
-.seat.selected {
-  background-color: #28a745;
+  background-color: #7B68EE; /* Medium Slate Blue */
   color: white;
+  border-color: #483D8B; /* Dark Slate Blue */
 }
 
+/* Sold seats - Keep distinct from platinum */
 .seat.sold {
   background-color: #e0e0e0;
   border-color: #bdbdbd;
@@ -352,10 +340,10 @@ input[type="checkbox"][data-seat-type="gold"]:checked + label {
   border-radius: 5px 5px 10px 10px;
 }
 
-/* Checkbox styling for platinum seats */
+/* Checkbox styling for platinum seats - Updated with more distinct colors */
 input[type="checkbox"][data-seat-type="platinum"]:checked + label {
-  background-color: #E5E4E2;
-  color: #333;
+  background-color: #7B68EE; /* Medium Slate Blue */
+  color: white;
   border-radius: 5px 5px 10px 10px;
 }
 
@@ -449,10 +437,13 @@ input[type="checkbox"][data-seat-type="platinum"]:checked + label {
                 if (seat.is_booked) {
                   // Mark seat as sold
                   seatDiv.classList.add('sold');
+                  seatDiv.classList.remove('platinum', 'gold'); // Remove type classes when sold
                   seatDiv.innerHTML = seat.seat_number;
                 } else {
                   // Mark seat as available
                   seatDiv.classList.remove('sold');
+                  seatDiv.classList.add(seatType); // Add appropriate type class
+                  
                   if (seatDiv.querySelector('input') === null) {
                     seatDiv.innerHTML = `
                       <input type="checkbox" name="seats" value="${seat.id}" class="d-none" id="seat-${seat.id}" data-seat-type="${seatType}" />
